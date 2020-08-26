@@ -31,7 +31,7 @@ class NasalSysTests : public CppUnit::TestFixture
 {
     // Set up the test suite.
     CPPUNIT_TEST_SUITE(NasalSysTests);
-    CPPUNIT_TEST(testDummy);
+    CPPUNIT_TEST(testCommands);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -43,6 +43,7 @@ public:
 
     // The tests.
     void testDummy();
+    void testCommands();
 };
 
 #endif  // _FG_NASALSYS_UNIT_TESTS_HXX

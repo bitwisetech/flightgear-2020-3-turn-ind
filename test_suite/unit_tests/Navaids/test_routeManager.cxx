@@ -94,7 +94,7 @@ void RouteManagerTests::testBasic()
     fp1->setIdent("testplan");
     fp1->setCruiseFlightLevel(360);
 
-    CPPUNIT_ASSERT_EQUAL("RIVER"s, fp1->legAtIndex(5)->waypoint()->ident());
+    CPPUNIT_ASSERT_EQUAL(std::string{"RIVER"}, fp1->legAtIndex(5)->waypoint()->ident());
 
     auto rm = globals->get_subsystem<FGRouteMgr>();
     rm->setFlightPlan(fp1);
