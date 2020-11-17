@@ -27,6 +27,8 @@
 #include <osgDB/ReadFile>
 #include <stdexcept>
 
+#include <simgear/scene/util/SGReaderWriterOptions.hxx>
+
 namespace canvas
 {
   //----------------------------------------------------------------------------
@@ -80,15 +82,18 @@ namespace canvas
   //----------------------------------------------------------------------------
   osg::ref_ptr<osg::Image> FGCanvasSystemAdapter::getImage(const std::string& path) const
   {
-      SGPath p(SGPath::fromUtf8(path));
+    SGPath p(SGPath::fromUtf8(path));
+    osg::ref_ptr<simgear::SGReaderWriterOptions> localReaderWriterOptions = simgear::SGReaderWriterOptions::copyOrCreate(osgDB::Registry::instance()->getOptions());
+    localReaderWriterOptions->setLoadOriginHint(simgear::SGReaderWriterOptions::LoadOriginHint::ORIGIN_CANVAS);
+
     if( p.isAbsolute() )
     {
       SGPath valid_path = fgValidatePath(p, false);
       if( !valid_path.isNull() )
 #if OSG_VERSION_LESS_THAN(3,4,0)
-          return osgDB::readRefImageFile(valid_path.utf8Str());
+          return osgDB::readRefImageFile(valid_path.utf8Str(), localReaderWriterOptions);
 #else
-          return osgDB::readRefImageFile(valid_path.utf8Str());
+          return osgDB::readRefImageFile(valid_path.utf8Str(), localReaderWriterOptions);
 #endif
 
       SG_LOG(SG_IO, SG_ALERT, "canvas::Image: reading '" << path << "' denied");
@@ -98,9 +103,9 @@ namespace canvas
       SGPath tpath = globals->resolve_resource_path(path);
       if( !tpath.isNull() )
 #if OSG_VERSION_LESS_THAN(3,4,0)
-          return osgDB::readImageFile(tpath.utf8Str());
+          return osgDB::readImageFile(tpath.utf8Str(), localReaderWriterOptions);
 #else
-          return osgDB::readRefImageFile(tpath.utf8Str());
+          return osgDB::readRefImageFile(tpath.utf8Str(), localReaderWriterOptions);
 #endif
 
       SG_LOG(SG_IO, SG_ALERT, "canvas::Image: No such image: '" << path << "'");
