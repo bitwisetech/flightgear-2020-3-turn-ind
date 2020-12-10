@@ -338,34 +338,32 @@ public:
 
   /**
    * Create a WayPoint from a string in the following format:
-   *  - simple identifier
-   *  - decimal-lon,decimal-lat
-   *  - airport-id/runway-id
-   *  - navaid/radial-deg/offset-nm
+   *  -
+   *  'vicinity' specifies the search area, to disambiguate navaids, etc with duplicate names
    */
-  WayptRef waypointFromString(const std::string& target);
+  WayptRef waypointFromString(const std::string& target, const SGGeod& vicinity = SGGeod::invalid());
 
-    /**
+  /**
      * attempt to replace the route waypoints (and potentially the SID and
      * STAR) based on an ICAO standard route string, i.e item 15.
      * Returns true if the rotue was parsed successfully (and this flight
      * plan modified accordingly) or false if the string could not be
      * parsed.
      */
-    bool parseICAORouteString(const std::string& routeData);
+  bool parseICAORouteString(const std::string& routeData);
 
-    std::string asICAORouteString() const;
+  std::string asICAORouteString() const;
 
-// ICAO flight-plan data
-    void setFlightRules(ICAOFlightRules rules);
-    ICAOFlightRules flightRules() const;
-    
-    void setFlightType(ICAOFlightType type);
-    ICAOFlightType flightType() const;
-    
-    void setCallsign(const std::string& callsign);
-    std::string callsign() const
-    { return _callsign; }
+  // ICAO flight-plan data
+  void setFlightRules(ICAOFlightRules rules);
+  ICAOFlightRules flightRules() const;
+
+  void setFlightType(ICAOFlightType type);
+  ICAOFlightType flightType() const;
+
+  void setCallsign(const std::string& callsign);
+  std::string callsign() const
+  { return _callsign; }
     
     void setRemarks(const std::string& remarks);
     std::string remarks() const
