@@ -706,10 +706,6 @@ bool runLauncherDialog()
     }
 
     int appResult = qApp->exec();
-    if (appResult <= 0) {
-        return false; // quit
-    }
-
     // avoid crashes / NavCache races if the loader is still running after
     // the launcher exits
     if (naturalEarthLoader) {
@@ -724,6 +720,10 @@ bool runLauncherDialog()
     globals->clear_fg_scenery();
     globals->get_locale()->clear();
 
+    if (appResult <= 0) {
+        return false; // quit
+    }
+    
     return true;
 }
 
