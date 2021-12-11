@@ -193,7 +193,8 @@ Rectangle {
                         rows: 2
                         columns: 3
                         rowSpacing: Style.margin
-                        columnSpacing: Style.margin
+                        columnSpacing: Style.margin * 3
+                        horizontalItemAlignment: Grid.AlignRight
 
                         StyledText {
                             id: ratingsLabel
