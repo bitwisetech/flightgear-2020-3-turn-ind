@@ -117,13 +117,13 @@ if (TARGET sentry::sentry)
     target_link_libraries(fgfs sentry::sentry)
 endif()
 
-if (TARGET sentry_crashpad::handler)
+if (TARGET sentry_crashpad::crashpad_handler)
     if (APPLE)
         # install inside the bundle
-        install(FILES $<TARGET_FILE:sentry_crashpad::handler> DESTINATION fgfs.app/Contents/MacOS OPTIONAL)
+        install(FILES $<TARGET_FILE:sentry_crashpad::crashpad_handler> DESTINATION fgfs.app/Contents/MacOS OPTIONAL)
     else()
         # install in the bin-dir, next to the application binary
-        install(FILES $<TARGET_FILE:sentry_crashpad::handler> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
+        install(FILES $<TARGET_FILE:sentry_crashpad::crashpad_handler> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
     endif()
 endif()
 
