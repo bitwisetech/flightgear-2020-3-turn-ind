@@ -20,9 +20,14 @@ SettingControl {
         SettingDescription {
             id: description
             enabled: root.enabled
+            /*: The “getstart” manual has translations. For languages listed in
+                $ALL_LANGUAGES at <https://sourceforge.net/p/flightgear/getstart/ci/next/tree/bin/makegetstart.sh>,
+                replace *both* occurrences of “en” in the URL with the
+                appropriate language code from $ALL_LANGUAGES. And please test
+                the modified URL before validating the translation. :-) */
             text: qsTr("Enter additional command-line arguments if any are required. " +
-                       "See <a href=\"http://flightgear.sourceforge.net/getstart-en/getstart-enpa2.html#x5-450004.5\">here</a> " +
-                       "for documentation on possible arguments. " +
+                       "See <a href=\"http://flightgear.sourceforge.net/manual/2020.3/en/getstart-ench4.html#x8-330004.4\">documentation</a> " +
+                       "for possible arguments. " +
                        "<br>" +
                        "<b>Warning:</b> values entered here always override other settings; <a href=\"#view-command-line\">click here</a> " +
                        "to view the final set of arguments that will be used"
