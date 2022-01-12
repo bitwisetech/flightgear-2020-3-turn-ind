@@ -502,9 +502,10 @@ Item {
                             "This is especially noticeable on sloping or diagonal edges. " +
                             "Higher settings can reduce performance.")
                         keywords: ["msaa", "anti", "aliasing", "multi", "sample"]
-                        choices: [qsTr("Off"), "2x", "4x"]
+
+                        choices: [qsTr("Off"), "2x", "4x", "8x"]
+                        property var data: [0, 2, 4, 8];
                         enabled: !renderSection.rembrandt
-                        property var data: [0, 2, 4];
                         defaultIndex: 0
                     },
 
