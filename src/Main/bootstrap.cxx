@@ -148,6 +148,44 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	main(numArgs, utf8Args.data());
 }
+
+// see https://stackoverflow.com/questions/35572792/setlocale-stuck-on-windows
+// for why we need this
+bool checkUniversalCRTVersion()
+{
+	DWORD               dwSize = 0;
+	VS_FIXEDFILEINFO    *pFileInfo = NULL;
+	UINT                puLenFileInfo = 0;
+
+	// Get the version information for the file requested
+	dwSize = GetFileVersionInfoSize("ucrtbase.dll", NULL);
+	if (dwSize == 0) {
+		return false;
+	}
+
+	std::vector<BYTE> versionInfo;
+	versionInfo.resize(dwSize);
+
+	if (!GetFileVersionInfo("ucrtbase.dll", 0, dwSize, versionInfo.data())) {
+		return false;
+	}
+
+	if (!VerQueryValue(versionInfo.data(), TEXT("\\"), (LPVOID*)&pFileInfo, &puLenFileInfo)) {
+		return false;
+	}
+
+	const WORD majorVersion = pFileInfo->dwFileVersionMS >> 16;
+	const WORD minorVersion = pFileInfo->dwFileVersionMS & 0xffff;
+	const WORD buildVersion = pFileInfo->dwFileVersionLS >> 16;
+	const WORD releaseVersion = pFileInfo->dwFileVersionLS & 0xffff;
+
+	// char buffer[256];
+	// snprintf(buffer, 256, "File Version: %d.%d.%d.%d\n",
+	// 	majorVersion, minorVersion, buildVersion, releaseVersion);
+	// OutputDebugString(buffer);
+	return (buildVersion > 10586);
+}
+
 #endif
 
 #if defined(__GNUC__)
@@ -257,6 +295,13 @@ int main ( int argc, char **argv )
   SetErrorMode(SEM_NOOPENFILEERRORBOX);
 
   hostname = ::getenv( "COMPUTERNAME" );
+
+  if (!checkUniversalCRTVersion()) {
+	  flightgear::fatalMessageBoxThenExit(
+		  "Fatal error",
+		  "The Microsoft Universal CRT on this computer is to old to run FlightGear. "
+		"Pleaese use Windows Update to update to a more recent Universal CRT version.");
+  }
 #else
   // Unix(alike) systems
   char _hostname[256];
@@ -268,8 +313,11 @@ int main ( int argc, char **argv )
   _bootstrap_OSInit = 0;
     
 #if defined(HAVE_SENTRY)
-  flightgear::initSentry();
-#endif
+  const bool noSentry = flightgear::Options::checkForArg(argc, argv, "disable-sentry");
+  if (!noSentry) {
+      flightgear::initSentry();
+  }
+  #endif
 
 // if we're not using the normal crash-reported, install our
 // custom segfault handler on Linux, in debug builds
@@ -291,7 +339,7 @@ int main ( int argc, char **argv )
     if (flightgear::Options::checkForArg(argc, argv, "uninstall")) {
         return fgUninstall();
     }
-
+    
     bool fgviewer = flightgear::Options::checkForArg(argc, argv, "fgviewer");
     int exitStatus = EXIT_FAILURE;
     try {
@@ -315,6 +363,7 @@ int main ( int argc, char **argv )
 #endif
         std::set_terminate(fg_terminate);
         atexit(fgExitCleanup);
+        
         if (fgviewer) {
             exitStatus = fgviewerMain(argc, argv);
         } else {
