@@ -323,7 +323,7 @@ find_package(OpenSceneGraph 3.2.0 REQUIRED
 find_package(sentry QUIET)
 
 if (TARGET sentry::sentry)
-    set(sentry_api_key "https://0a09844101964772898e29a7de233794@o372956.ingest.sentry.io/5188535")
+    set(sentry_api_key "https://c9c7ea97f65347ddab678977afecc7b4@o372956.ingest.sentry.io/5188535")
     message(STATUS "Sentry.io crash reporting enabled")
     set(HAVE_SENTRY 1)
 endif()
