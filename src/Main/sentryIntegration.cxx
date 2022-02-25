@@ -291,11 +291,9 @@ void initSentry()
     // FLIGHTGEAR_SENTRY_API_KEY
     sentry_options_set_dsn(options, SENTRY_API_KEY);
     
-    if (strcmp(FG_BUILD_TYPE, "Dev") == 0) {
-        sentry_options_set_release(options, "flightgear-dev@" FLIGHTGEAR_VERSION);
-    } else {
-        sentry_options_set_release(options, "flightgear@" FLIGHTGEAR_VERSION);
-    }
+    // modified for 2020.3: we don't want to create '-dev' releases
+    // even if people self-compile the branch.
+    sentry_options_set_release(options, "flightgear@" FLIGHTGEAR_VERSION);
     
     const auto buildString = std::to_string(JENKINS_BUILD_NUMBER);
     sentry_options_set_dist(options, buildString.c_str());
