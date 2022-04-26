@@ -132,10 +132,11 @@ elseif(WIN32)
     set(EVENT_INPUT_DEFAULT 1)
     list(APPEND PLATFORM_LIBS "Shlwapi.lib" "Version.lib")
 
-    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "bin")
-    set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    include(InstallRequiredSystemLibraries)
-    MESSAGE("Installing: ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}")
+    # disabling for now so we don' bundle an outdatd UCRT
+ #   set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "bin")
+ #   set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+ #   include(InstallRequiredSystemLibraries)
+  #  MESSAGE("Installing: ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}")
 
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR
 	${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" OR
