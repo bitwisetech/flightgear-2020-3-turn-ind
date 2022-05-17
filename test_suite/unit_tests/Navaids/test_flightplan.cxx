@@ -323,7 +323,7 @@ void FlightplanTests::testRoutePathTrivialFlightPlan()
         rtepath.distanceForIndex(leg);
     }
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(19.68, fp1->totalDistanceNm(), 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(19.68, fp1->totalDistanceNm(), 0.2);
 }
 
 void FlightplanTests::testRoutePathVec()

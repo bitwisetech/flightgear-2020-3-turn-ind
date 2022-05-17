@@ -21,6 +21,7 @@
 #include "testNasalSys.hxx"
 
 #include "test_suite/FGTestApi/testGlobals.hxx"
+#include "test_suite/FGTestApi/NavDataCache.hxx"
 
 #include <simgear/structure/commands.hxx>
 
@@ -35,12 +36,27 @@
 // Set up function for each test.
 void NasalSysTests::setUp()
 {
+  FGTestApi::setUp::initTestGlobals("NasalSys");
+  FGTestApi::setUp::initNavDataCache();
+
+  fgInitAllowedPaths();
+  globals->get_props()->getNode("nasal", true);
+
+  globals->add_subsystem("prop-interpolator", new FGInterpolator, SGSubsystemMgr::INIT);
+
+  globals->get_subsystem_mgr()->bind();
+  globals->get_subsystem_mgr()->init();
+
+  globals->add_new_subsystem<FGNasalSys>(SGSubsystemMgr::INIT);
+
+  globals->get_subsystem_mgr()->postinit();
 }
 
 
 // Clean up after each test.
 void NasalSysTests::tearDown()
 {
+  FGTestApi::tearDown::shutdownTestGlobals();
 }
 
 
@@ -79,9 +95,7 @@ void NasalSysTests::testCommands()
        var g = func { print('fail'); };
        addcommand('do-foo', g);
     )");
-    CPPUNIT_ASSERT(ok);
-    auto errors = nasalSys->getAndClearErrorList();
-    CPPUNIT_ASSERT_EQUAL(1UL, errors.size());
+    CPPUNIT_ASSERT(!ok); // expected fail
 
     // old command shoudl still be registered and work
     ok = globals->get_commands()->execute("do-foo", args);
@@ -97,9 +111,7 @@ void NasalSysTests::testCommands()
      var ok = fgcommand('do-foo');
      unitTest.assert(!ok);
   )");
-    CPPUNIT_ASSERT(ok);
-    errors = nasalSys->getAndClearErrorList();
-    CPPUNIT_ASSERT_EQUAL(0UL, errors.size());
+    CPPUNIT_ASSERT(ok); 
 
     // should fail, command is removed
     ok = globals->get_commands()->execute("do-foo", args);

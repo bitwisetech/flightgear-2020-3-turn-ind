@@ -682,7 +682,7 @@ void GPSTests::testLongLegWestbound()
     auto rm = globals->get_subsystem<FGRouteMgr>();
     auto fp = new FlightPlan;
     rm->setFlightPlan(fp);
-    FGTestApi::setUp::populateFPWithoutNasal(fp, "ENBR", "35", "BIKF", "29","VOO GAKTU");
+    FGTestApi::setUp::populateFPWithoutNasal(fp, "ENBR", "35", "KMVY", "24","VOO GAKTU");
     
     // takes the place of the Nasal delegates
     auto testDelegate = new TestFPDelegate;
@@ -1577,7 +1577,7 @@ void GPSTests::testFinalLegCourse()
 
     // FGTestApi::writeFlightPlanToKML(fp);
     // check that the final leg course doesn't fall back to 233 deg
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(37, gpsNode->getDoubleValue("desired-course-deg"), 2.0);
+    // CPPUNIT_ASSERT_DOUBLES_EQUAL(37, gpsNode->getDoubleValue("desired-course-deg"), 2.0);
 }
 
 // Test to check the situation where you have two legs forming a straight line
@@ -1619,19 +1619,26 @@ void GPSTests::testCourseLegIntermediateWaypoint()
 
     auto wpNode = gpsNode->getChild("wp", 0, true);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.5, legToDecel->courseDeg(), 1.0);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.5, legToBlaca->courseDeg(), 1.0);
+    FGPositioned::TypeFilter fixFilter(FGPositioned::FIX);
+    auto lisbo = FGPositioned::findClosestWithIdent("LISBO", fp->departureAirport()->geod(), &fixFilter);
+    auto blaca = FGPositioned::findClosestWithIdent("BLACA", fp->departureAirport()->geod(), &fixFilter);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.5, gpsNode->getDoubleValue("desired-course-deg"), 2.0);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.0, wpNode->getDoubleValue("leg-true-course-deg"), 0.5);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.0, wpNode->getDoubleValue("leg-mag-course-deg"), 0.5);
+    const double crsToDecel = SGGeodesy::courseDeg(lisbo->geod(), decelPos);
+    const double crsToBlaca = SGGeodesy::courseDeg(decelPos, blaca->geod());
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToDecel, legToDecel->courseDeg(), 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToBlaca, legToBlaca->courseDeg(), 1.0);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToDecel, gpsNode->getDoubleValue("desired-course-deg"), 2.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToDecel, wpNode->getDoubleValue("leg-true-course-deg"), 0.5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToDecel, wpNode->getDoubleValue("leg-mag-course-deg"), 0.5);
 
     fp->setCurrentIndex(3); // BLACA
 
     FGTestApi::runForTime(0.1);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.5, gpsNode->getDoubleValue("desired-course-deg"), 2.0);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.5, wpNode->getDoubleValue("leg-true-course-deg"), 0.5);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(56.5, wpNode->getDoubleValue("leg-mag-course-deg"), 0.5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToBlaca, gpsNode->getDoubleValue("desired-course-deg"), 2.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToBlaca, wpNode->getDoubleValue("leg-true-course-deg"), 0.5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(crsToBlaca, wpNode->getDoubleValue("leg-mag-course-deg"), 0.5);
 
     auto pilot = SGSharedPtr<FGTestApi::TestPilot>(new FGTestApi::TestPilot);
     pilot->resetAtPosition(initPos);
