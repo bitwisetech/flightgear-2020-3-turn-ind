@@ -51,6 +51,8 @@ FGAircraftModel::FGAircraftModel ()
     _speed_e(0),
     _speed_d(0)
 {
+    // ensure FGFX captures correct context for loading issues
+    simgear::ErrorReportContext ec("primary-aircraft", "yes");
     _fx = new FGFX("fx");
     _fx->init();
 }
