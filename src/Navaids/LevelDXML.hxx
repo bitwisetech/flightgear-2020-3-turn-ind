@@ -51,6 +51,7 @@ private:
   std::string _ident; // id of segment under construction
   std::string _transIdent;
   double _longitude, _latitude, _altitude, _speed;
+  double _constraintAltitude = 0.0;
   RouteRestriction _altRestrict;
   bool _overflightWaypt;
   

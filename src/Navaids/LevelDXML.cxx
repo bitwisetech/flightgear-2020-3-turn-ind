@@ -197,6 +197,8 @@ void NavdataVisitor::endElement(const char* name)
     _speed = atoi(_text.c_str());
   } else if (tag == "Altitude") {
     _altitude = atof(_text.c_str());
+  } else if (tag == "AltitudeCons") {
+      _constraintAltitude = atof(_text.c_str());
   } else if (tag == "AltitudeRestriction") {
     if (_text == "at") {
       _altRestrict = RESTRICT_AT;
@@ -204,6 +206,15 @@ void NavdataVisitor::endElement(const char* name)
       _altRestrict = RESTRICT_ABOVE;
     } else if (_text == "below") {
       _altRestrict = RESTRICT_BELOW;
+    } else if (_text == "between") {
+      // work-around: avoid an exception/error on procedures which use
+      // 'between' restriction, without adding full support as we did on next.
+      // instead just map this to ABOVE.
+      _altRestrict = RESTRICT_ABOVE;
+
+      // this ordering works because the Navigraph level-D has the restriction
+      // after the altitudes. 
+      _altitude = _constraintAltitude;
     } else {
       throw sg_format_exception("Unrecognized altitude restriction", _text);
     }
@@ -230,8 +241,7 @@ void NavdataVisitor::endElement(const char* name)
   } else if (tag == "Flytype") {
     // values are 'Fly-by' and 'Fly-over'
     _overflightWaypt = (_text == "Fly-over");
-  } else if ((tag == "AltitudeCons") ||
-             (tag == "BankLimit") ||
+  } else if ((tag == "BankLimit") ||
              (tag == "Sp_Turn") ||
              (tag == "Airport") ||
              (tag == "ProceduresDB"))
