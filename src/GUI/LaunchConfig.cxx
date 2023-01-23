@@ -105,6 +105,19 @@ void LaunchConfig::setArg(QString name, QString value, Origin origin)
     m_values.push_back(Arg(name, value, origin));
 }
 
+QString LaunchConfig::getArg(QString name) const
+{
+    auto it = std::find_if(m_values.begin(), m_values.end(), [name](const Arg& a) {
+        return a.arg == name;
+    });
+
+    if (it == m_values.end()) {
+        return {};
+    }
+
+    return it->value;
+}
+
 void LaunchConfig::setArg(const std::string &name, const std::string &value)
 {
     setArg(QString::fromStdString(name), QString::fromStdString(value), Launcher);

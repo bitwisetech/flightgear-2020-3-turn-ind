@@ -299,10 +299,15 @@ void LauncherController::collectAircraftArgs()
             Q_ASSERT(setFile.endsWith("-set.xml"));
             setFile.truncate(setFile.count() - 8); // drop the '-set.xml' portion
             m_config->setArg("aircraft", setFile);
+
+            flightgear::addSentryBreadcrumb("Launcher: collectAircraftArgs:" + m_config->getArg("aircraft").toStdString()
+                + " at " + m_config->getArg("aircraft-dir").toStdString(), "info");
         } else if (m_selectedAircraft.scheme() == "package") {
             // no need to set aircraft-dir, handled by the corresponding code
             // in fgInitAircraft
             m_config->setArg("aircraft", m_selectedAircraft.path());
+
+            flightgear::addSentryBreadcrumb("Launcher: collectAircraftArgs:" + m_config->getArg("aircraft").toStdString(), "info");
         } else {
             qWarning() << "unsupported aircraft launch URL" << m_selectedAircraft;
         }
@@ -325,6 +330,7 @@ void LauncherController::collectAircraftArgs()
 
 void LauncherController::saveAircraft()
 {
+    flightgear::addSentryBreadcrumb("Launcher: saveAircraft:" + m_selectedAircraft.toString().toStdString(), "info");
     m_config->setValueForKey("", "selected-aircraft", m_selectedAircraft);
     if (!m_aircraftState.isEmpty()) {
         m_config->setValueForKey("", "selected-aircraft-state", m_aircraftState);

@@ -78,6 +78,8 @@ public:
     std::vector<Arg> valuesFromLauncher() const;
     std::vector<Arg> valuesFromExtraArgs() const;
 
+    QString getArg(QString name) const;
+
 signals:
     void collect();
     
