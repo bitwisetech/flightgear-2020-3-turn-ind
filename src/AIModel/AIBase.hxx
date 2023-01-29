@@ -111,6 +111,9 @@ public:
     void setName(const std::string& n);
     void setMaxSpeed(double kts);
 
+    void setCollisionLength(int range);
+    void setCollisionHeight(int height);
+
     void calcRangeBearing(double lat, double lon, double lat2, double lon2,
         double &range, double &bearing) const;
     double calcRelBearingDeg(double bearing, double heading);
@@ -143,6 +146,9 @@ public:
 
     osg::PagedLOD* getSceneBranch() const;
 
+    virtual int getCollisionHeight() const;
+    virtual int getCollisionLength() const;
+
     void setScenarioPath(const std::string& scenarioPath);
 
 protected:
@@ -159,6 +165,9 @@ protected:
     double _yaw_offset;
 
     double _max_speed = 300.0;
+
+    int collisionHeight = 0;
+    int collisionLength = 0;
 
     std::string _path;
     std::string _callsign;
@@ -456,6 +465,14 @@ inline void FGAIBase::setName(const std::string& n) {
     _name = n;
 }
 
+inline void FGAIBase::setCollisionLength(int length){
+    collisionLength = length;
+}
+
+inline void FGAIBase::setCollisionHeight(int height){
+    collisionHeight = height;
+}
+
 inline void FGAIBase::setDie( bool die ) { delete_me = die; }
 
 inline bool FGAIBase::getDie() { return delete_me; }
@@ -493,5 +510,48 @@ inline void FGAIBase::setMaxSpeed(double m) {
     _max_speed = m;
 }
 
+/*
+ * Default height and lengths for AI submodel collision detection.
+ * The difference in height is used first and then the range must be within 
+ * the value specifed in the length field. This effective chops the top and 
+ * bottom off the circle - but does not take into account the orientation of the
+ * AI model; so this algorithm is fast but fairly innaccurate.
+ * 
+ * Default values:
+ * +---------------+-------------+------------+
+ * | Type          | Height(m)   |  Length(m) |
+ * +---------------+-------------+------------+
+ * | Null          |      0      |        0   |
+ * | Aircraft      |     50      |      100   |
+ * | Ship          |    100      |      200   |
+ * | Carrier       |    250      |      750   |
+ * | Ballistic     |      0      |        0   |
+ * | Rocket        |    100      |       50   |
+ * | Storm         |      0      |        0   |
+ * | Thermal       |      0      |        0   |
+ * | Static        |     50      |      200   |
+ * | Wingman       |     50      |      100   |
+ * | GroundVehicle |     20      |       40   |
+ * | Escort        |    100      |      200   |
+ * | Multiplayer   |     50      |      100   |
+ * +---------------+-------------+------------+
+ */
+const static double tgt_ht[] = {0, 50, 100, 250, 0, 100, 0, 0, 50, 50, 20, 100, 50};
+const static double tgt_length[] = {0, 100, 200, 750, 0,  50, 0, 0, 200, 100, 40, 200, 100};
 
+inline int FGAIBase::getCollisionHeight() const
+{
+    if (collisionHeight == 0)
+        return tgt_ht[static_cast<int>(_otype)];
+
+    return collisionHeight;
+}
+inline int FGAIBase::getCollisionLength() const
+{
+    if (collisionLength == 0)
+        return tgt_length[static_cast<int>(_otype)];
+
+    return collisionLength;
+}
 #endif // _FG_AIBASE_HXX
+
